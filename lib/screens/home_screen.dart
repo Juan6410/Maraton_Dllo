@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/budget_provider.dart';
+import 'transport_screen.dart';
+import 'food_screen.dart';
+import 'accommodation_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -8,9 +11,6 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final _dailyLimitController = TextEditingController();
-    final _categoryLimitControllerTravel = TextEditingController();
-    final _categoryLimitControllerFood = TextEditingController();
-    final _categoryLimitControllerHotel = TextEditingController();
 
     return Scaffold(
       appBar: AppBar(
@@ -25,6 +25,8 @@ class HomeScreen extends StatelessWidget {
               children: [
                 Text(
                     'Tope Diario: \$${budgetProvider.dailyLimit.toStringAsFixed(2)}'),
+                Text(
+                    'Presupuesto Restante: \$${budgetProvider.remainingBudget.toStringAsFixed(2)}'),
                 TextField(
                   controller: _dailyLimitController,
                   decoration:
@@ -42,47 +44,53 @@ class HomeScreen extends StatelessWidget {
                   child: const Text('Actualizar tope diario'),
                 ),
                 const SizedBox(height: 20),
-                Text('Categorías:'),
-                ...budgetProvider.categories.map((category) {
-                  return ListTile(
-                    title: Text(category.name),
-                    trailing: Text('\$${category.limit.toStringAsFixed(2)}'),
-                  );
-                }).toList(),
-                TextFieldCategories(_categoryLimitControllerTravel, 'Nuevo límite para la categoría de transporte'),
-                buttonCategories(budgetProvider, _categoryLimitControllerTravel, 'Actualizar límite de transporte', 'Transporte'),
-                TextFieldCategories(_categoryLimitControllerFood, 'Nuevo límite para la categoría de comida'),
-                buttonCategories(budgetProvider, _categoryLimitControllerFood, 'Actualizar límite de comida', 'Comida'),
-                TextFieldCategories(_categoryLimitControllerHotel, 'Nuevo límite para la categoría de Alojamiento'),
-                buttonCategories(budgetProvider, _categoryLimitControllerHotel, 'Actualizar límite de Alojamiento', 'Alojamiento'),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const TransportScreen()),
+                    );
+                  },
+                  child: const Text('Gestión de Transporte'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const FoodScreen()),
+                    );
+                  },
+                  child: const Text('Gestión de Comida'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const AccommodationScreen()),
+                    );
+                  },
+                  child: const Text('Gestión de Alojamiento'),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    budgetProvider.newDay();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content: Text(
+                              'Nuevo día iniciado. Presupuesto restablecido.')),
+                    );
+                  },
+                  child: const Text('Nuevo Día'),
+                ),
               ],
             ),
           );
         },
       ),
     );
-  }
-
-  TextField TextFieldCategories( TextEditingController _categoryLimitController, label){
-    return TextField(
-                  controller: _categoryLimitController,
-                  decoration: InputDecoration(
-                      labelText: label),
-                  keyboardType: TextInputType.number,
-                );
-  }
-
-  ElevatedButton buttonCategories(BudgetProvider budgetProvider, TextEditingController _categoryLimitController, label, String category){
-    return ElevatedButton(
-                  onPressed: () {
-                    final newLimit =
-                        double.tryParse(_categoryLimitController.text);
-                    if (newLimit != null) {
-                      budgetProvider.updateCategoryLimit(
-                          category, newLimit);
-                    }
-                  },
-                  child:  Text(label),
-                );
   }
 }
