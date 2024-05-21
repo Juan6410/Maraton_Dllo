@@ -23,6 +23,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       home: HomeScreen(),
+      debugShowCheckedModeBanner: false, // Remove debug mode banner
     );
   }
 }
