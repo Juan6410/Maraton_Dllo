@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/budget_provider.dart';
+import 'transport_screen.dart';
+import 'food_screen.dart';
+import 'accommodation_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -8,7 +11,6 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final _dailyLimitController = TextEditingController();
-    final _categoryLimitController = TextEditingController();
 
     return Scaffold(
       appBar: AppBar(
@@ -23,6 +25,8 @@ class HomeScreen extends StatelessWidget {
               children: [
                 Text(
                     'Tope Diario: \$${budgetProvider.dailyLimit.toStringAsFixed(2)}'),
+                Text(
+                    'Presupuesto Restante: \$${budgetProvider.remainingBudget.toStringAsFixed(2)}'),
                 TextField(
                   controller: _dailyLimitController,
                   decoration:
@@ -40,29 +44,47 @@ class HomeScreen extends StatelessWidget {
                   child: const Text('Actualizar tope diario'),
                 ),
                 const SizedBox(height: 20),
-                Text('Categorías:'),
-                ...budgetProvider.categories.map((category) {
-                  return ListTile(
-                    title: Text(category.name),
-                    trailing: Text('\$${category.limit.toStringAsFixed(2)}'),
-                  );
-                }).toList(),
-                TextField(
-                  controller: _categoryLimitController,
-                  decoration: const InputDecoration(
-                      labelText: 'Nuevo límite para la categoría Transporte'),
-                  keyboardType: TextInputType.number,
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const TransportScreen()),
+                    );
+                  },
+                  child: const Text('Gestión de Transporte'),
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    final newLimit =
-                        double.tryParse(_categoryLimitController.text);
-                    if (newLimit != null) {
-                      budgetProvider.updateCategoryLimit(
-                          'Transporte', newLimit);
-                    }
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const FoodScreen()),
+                    );
                   },
-                  child: const Text('Actualizar límite de Transporte'),
+                  child: const Text('Gestión de Comida'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const AccommodationScreen()),
+                    );
+                  },
+                  child: const Text('Gestión de Alojamiento'),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    budgetProvider.newDay();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content: Text(
+                              'Nuevo día iniciado. Presupuesto restablecido.')),
+                    );
+                  },
+                  child: const Text('Nuevo Día'),
                 ),
               ],
             ),
